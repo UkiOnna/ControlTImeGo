@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -25,15 +26,77 @@ namespace RefreshApp
     {
         private Timer timer;
         private Uri iconUri;
+        private Uri imageUri;
         Application cur;
-        private object lockObject=new object();
+        private object lockObject = new object();
+        public string updateIconPath { get; set; }
+        public string updateImagePath { get; set; }
         public MainWindow()
         {
             InitializeComponent();
-            iconUri = new Uri(@"C:\Users\СикировТ\Documents\Visual Studio 2017\Projects\RefreshApp\RefreshApp\Icons\icon.jpg", UriKind.RelativeOrAbsolute);
+
+            Directory.CreateDirectory("D:/programRestart");
+            Directory.CreateDirectory("D:/programUpdate");
+            try
+            {
+
+               var icoInf = new FileInfo("D:/programRestart/mainIcon.png");
+               var backInf = new FileInfo("D:/programRestart/mainImage.png");
+
+                if (icoInf.Exists && backInf.Exists)
+                {
+                    icoInf.Delete();
+                    backInf.Delete();
+                    // альтернатива с помощью класса File
+                    // File.Delete(path);
+                }
+                else
+                {
+
+                    File.Copy(Directory.GetCurrentDirectory() + @"\Backrounds\Background.png", "D:/programRestart/mainImage.png");
+                    File.Copy(Directory.GetCurrentDirectory() + @"\Icons\Icon.png", "D:/programRestart/mainIcon.png");
+                }
+            }
+            catch(Exception a)
+            {
+                //MessageBox.Show(a.Message);
+            }
+
+            iconUri = new Uri("D:/programRestart/mainIcon.png", UriKind.RelativeOrAbsolute);
             this.Icon = BitmapFrame.Create(iconUri);
+
+            imageUri = new Uri("D:/programRestart/mainImage.png", UriKind.RelativeOrAbsolute);
+            mainImage.ImageSource = BitmapFrame.Create(imageUri);
+
+
+            try
+            {
+               var icoInf = new FileInfo("D:/programRestart/currentIcon.png");
+               var backInf = new FileInfo("D:/programRestart/currentImage.png");
+
+                if (icoInf.Exists && backInf.Exists)
+                {
+                    icoInf.Delete();
+                    backInf.Delete();
+                    // альтернатива с помощью класса File
+                    // File.Delete(path);
+                }
+                else
+                {
+
+                    File.Copy("D:/programRestart/mainIcon.png", "D:/programRestart/currentIcon.png");
+                    File.Copy("D:/programRestart/mainImage.png", "D:/programRestart/currentImage.png");
+                }
+            }
+            catch
+            {
+
+            }
+
+
+
             cur = Application.Current;
-            timer = new Timer(CheckFiles, cur, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(15)); 
+            timer = new Timer(CheckFiles, cur, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(15));
         }
 
 
@@ -46,18 +109,39 @@ namespace RefreshApp
                 (ThreadStart)delegate ()
                 {
 
-                 //   try
-                   // {
-                        // Only get files that begin with the letter "c."
-                        string[] icons = Directory.GetFiles(@"C:\Users\СикировТ\Documents\files", "icon*");//хранятся пути 
-                        string[] backgronds = Directory.GetFiles(@"C:\Users\СикировТ\Documents\files", "Background*");
-                    
-                        if (icons.Length > 0 && backgronds.Length > 0)
-                        {
-                        if (FileCompare(icons[0], @"C:\Users\СикировТ\Documents\Visual Studio 2017\Projects\RefreshApp\RefreshApp\Icons\icon.jpg") && FileCompare(backgronds[0], @"C:\Users\СикировТ\Documents\Visual Studio 2017\Projects\RefreshApp\RefreshApp\Backrounds\Backround.jpg"))
-                        {
+                    //   try
+                    // {
+                    // Only get files that begin with the letter "c."
+                    string[] icons = Directory.GetFiles("D:/programUpdate", "icon*");//хранятся пути НАЗВАНИЯ НАЧИНАЮТСЯ НА icon И image
+                    string[] backgronds = Directory.GetFiles("D:/programUpdate", "image*");
+                    string updateIcon="";
+                    string updateImage="";
 
 
+                    if (icons.Length > 0 && backgronds.Length > 0)
+                    {
+                        foreach(string o in icons)
+                        {
+                            if (!FileCompare(o, "D:/programRestart/currentIcon.png"))
+                            {
+                                updateIcon = o;
+                                break;
+                            }
+                        }
+
+                        foreach(string o in backgronds)
+                        {
+                            if (!FileCompare(o, "D:/programRestart/currentImage.png"))
+                            {
+                                updateImage = o;
+                                break;
+                            }
+                        }
+                        if (updateImage.Length>0 &&updateIcon.Length>0)
+                        {
+
+                            updateIconPath = updateIcon;
+                            updateImagePath = updateImage;
                             MessageBoxResult res = MessageBox.Show("Обнаружены обновления хотите загрузить?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Warning);
                             if (MessageBoxResult.No == res)
                             {
@@ -66,54 +150,70 @@ namespace RefreshApp
                             else
                             {
 
-                                FileChange(icons[0], backgronds[0]);
-                                timer.Dispose();
-                                System.Diagnostics.Process.Start(Application.ResourceAssembly.Location);
-                                mes.Shutdown();
-
-
+                                Restart(mes);
                                 //do yes stuff
                             }
                         }
-                        }
+                    }
 
-                  //  }
-                  //  catch (Exception e)
+                    //  }
+                    //  catch (Exception e)
                     //{
-                     //   MessageBox.Show("The process failed: {0}", e.ToString());
+                    //   MessageBox.Show("The process failed: {0}", e.ToString());
                     //}
                 }
                 );
         }
 
-        public void FileChange(string iconPathh,string backPathh)
+        public void Restart(Application mes)
         {
-            string iconPath = @"C:\Users\СикировТ\Documents\Visual Studio 2017\Projects\RefreshApp\RefreshApp\Icons\icon.jpg";
-            string backPath = @"C:\Users\СикировТ\Documents\Visual Studio 2017\Projects\RefreshApp\RefreshApp\Backrounds\Backround.jpg";
-            FileInfo icoInf = new FileInfo(iconPath);
-            FileInfo backInf = new FileInfo(backPath);
-            if (icoInf.Exists && backInf.Exists)
-            {
-                icoInf.Delete();
-                backInf.Delete();
-                // альтернатива с помощью класса File
-                // File.Delete(path);
-            }
+            Thread thread = new Thread(FileChange);
+            //FileChange();
+            
+            timer.Dispose();
+            
+            thread.Start();
+            
+            mes.Shutdown();
+            
+        }
 
-            string newIconPath = @"C:\Users\СикировТ\Documents\Visual Studio 2017\Projects\RefreshApp\RefreshApp\Icons\icon.jpg";
+        public void FileChange()
+        {
+            lock (lockObject) {
+                string iconPath = Directory.GetCurrentDirectory() + @"\Icons\icon.png";
+                string backPath = Directory.GetCurrentDirectory() + @"\Backrounds\Background.png";
 
-            string newBackPath = @"C:\Users\СикировТ\Documents\Visual Studio 2017\Projects\RefreshApp\RefreshApp\Backrounds\Backround.jpg";
+                FileInfo icoInf = new FileInfo(iconPath);
+                FileInfo backInf = new FileInfo(backPath);
+                if (icoInf.Exists && backInf.Exists)
+                {
+                    icoInf.Delete();
+                    backInf.Delete();
+                    // альтернатива с помощью класса File
+                    // File.Delete(path);
+                }
 
-            FileInfo icoFileInf = new FileInfo(iconPath);
-            FileInfo backFileInf = new FileInfo(backPath);
-            if (icoFileInf.Exists && backFileInf.Exists) ;
-            {
-                icoFileInf.MoveTo(newIconPath);
-                backFileInf.MoveTo(newBackPath);
-                // альтернатива с помощью класса File
-                // File.Move(path, newPath);
-            }
 
+           
+
+
+;
+
+                FileInfo icoFileInf = new FileInfo(updateIconPath);
+                FileInfo backFileInf = new FileInfo(updateImagePath);
+
+                if (icoFileInf.Exists && backFileInf.Exists) 
+                {
+                    icoFileInf.MoveTo(iconPath);
+                    backFileInf.MoveTo(backPath);
+                    // альтернатива с помощью класса File
+                    // File.Move(path, newPath);
+                }
+
+
+                //System.Diagnostics.Process.Start(Application.ResourceAssembly.Location);
+                System.Diagnostics.Process.Start("RefreshApp"); }
         }
 
         private bool FileCompare(string file1, string file2)

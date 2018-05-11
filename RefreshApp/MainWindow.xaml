@@ -6,13 +6,9 @@
         xmlns:local="clr-namespace:RefreshApp"
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
-    <Window.Background>
-        <ImageBrush/>
-    </Window.Background>
-    <Grid Name="grida">
+    <Grid>
         <Grid.Background>
-            <ImageBrush ImageSource="C:\Users\СикировТ\Documents\Visual Studio 2017\Projects\RefreshApp\RefreshApp\Backrounds\Backround.jpg"/>
+            <ImageBrush x:Name="mainImage"/>
         </Grid.Background>
-
     </Grid>
 </Window>
