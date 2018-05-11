@@ -1,0 +1,18 @@
+﻿<Window x:Class="RefreshApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RefreshApp"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="350" Width="525">
+    <Window.Background>
+        <ImageBrush/>
+    </Window.Background>
+    <Grid Name="grida">
+        <Grid.Background>
+            <ImageBrush ImageSource="C:\Users\СикировТ\Documents\Visual Studio 2017\Projects\RefreshApp\RefreshApp\Backrounds\Backround.jpg"/>
+        </Grid.Background>
+
+    </Grid>
+</Window>
