@@ -31,17 +31,23 @@ namespace RefreshApp
         private object lockObject = new object();
         public string updateIconPath { get; set; }
         public string updateImagePath { get; set; }
+        private bool update;
+        private bool updateIc;
+        private bool updateIm;
         public MainWindow()
         {
             InitializeComponent();
+            update = false;
+            updateIc = false;
+            updateIm = false;
 
             Directory.CreateDirectory("D:/programRestart");
             Directory.CreateDirectory("D:/programUpdate");
             try
             {
 
-               var icoInf = new FileInfo("D:/programRestart/mainIcon.png");
-               var backInf = new FileInfo("D:/programRestart/mainImage.png");
+                var icoInf = new FileInfo("D:/programRestart/mainIcon.png");
+                var backInf = new FileInfo("D:/programRestart/mainImage.png");
 
                 if (icoInf.Exists && backInf.Exists)
                 {
@@ -50,14 +56,14 @@ namespace RefreshApp
                     // альтернатива с помощью класса File
                     // File.Delete(path);
                 }
-                
-                
 
-                    File.Copy(Directory.GetCurrentDirectory() + @"\Backrounds\Background.png", "D:/programRestart/mainImage.png");
-                    File.Copy(Directory.GetCurrentDirectory() + @"\Icons\Icon.png", "D:/programRestart/mainIcon.png");
-                
+
+
+                File.Copy(Directory.GetCurrentDirectory() + @"\Backrounds\Background.png", "D:/programRestart/mainImage.png");
+                File.Copy(Directory.GetCurrentDirectory() + @"\Icons\Icon.png", "D:/programRestart/mainIcon.png");
+
             }
-            catch(Exception a)
+            catch (Exception a)
             {
                 //MessageBox.Show(a.Message);
             }
@@ -71,8 +77,8 @@ namespace RefreshApp
 
             try
             {
-               var icoInf = new FileInfo("D:/programRestart/currentIcon.png");
-               var backInf = new FileInfo("D:/programRestart/currentImage.png");
+                var icoInf = new FileInfo("D:/programRestart/currentIcon.png");
+                var backInf = new FileInfo("D:/programRestart/currentImage.png");
 
                 if (icoInf.Exists && backInf.Exists)
                 {
@@ -81,12 +87,12 @@ namespace RefreshApp
                     // альтернатива с помощью класса File
                     // File.Delete(path);
                 }
-               
-               
 
-                    File.Copy("D:/programRestart/mainIcon.png", "D:/programRestart/currentIcon.png");
-                    File.Copy("D:/programRestart/mainImage.png", "D:/programRestart/currentImage.png");
-                
+
+
+                File.Copy("D:/programRestart/mainIcon.png", "D:/programRestart/currentIcon.png");
+                File.Copy("D:/programRestart/mainImage.png", "D:/programRestart/currentImage.png");
+
             }
             catch
             {
@@ -114,13 +120,13 @@ namespace RefreshApp
                     // Only get files that begin with the letter "c."
                     string[] icons = Directory.GetFiles("D:/programUpdate", "icon*");//хранятся пути НАЗВАНИЯ НАЧИНАЮТСЯ НА icon И image
                     string[] backgronds = Directory.GetFiles("D:/programUpdate", "image*");
-                    string updateIcon="";
-                    string updateImage="";
+                    string updateIcon = "";
+                    string updateImage = "";
 
 
-                    if (icons.Length > 0 && backgronds.Length > 0)
+                    if (icons.Length > 0 || backgronds.Length > 0)
                     {
-                        foreach(string o in icons)
+                        foreach (string o in icons)
                         {
                             if (!FileCompare(o, "D:/programRestart/currentIcon.png"))
                             {
@@ -129,7 +135,7 @@ namespace RefreshApp
                             }
                         }
 
-                        foreach(string o in backgronds)
+                        foreach (string o in backgronds)
                         {
                             if (!FileCompare(o, "D:/programRestart/currentImage.png"))
                             {
@@ -137,11 +143,22 @@ namespace RefreshApp
                                 break;
                             }
                         }
-                        if (updateImage.Length>0 &&updateIcon.Length>0)
+
+                        if (updateImage.Length > 0)
                         {
 
-                            updateIconPath = updateIcon;
                             updateImagePath = updateImage;
+                            update = true;
+                            updateIm = true;
+                        }
+                        if (updateIcon.Length > 0)
+                        {
+                            updateIconPath = updateIcon;
+                            update = true;
+                            updateIc = true;
+                        }
+                        if (update)
+                        {
                             MessageBoxResult res = MessageBox.Show("Обнаружены обновления хотите загрузить?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Warning);
                             if (MessageBoxResult.No == res)
                             {
@@ -155,6 +172,8 @@ namespace RefreshApp
                             }
                         }
                     }
+                        
+                    
 
                     //  }
                     //  catch (Exception e)
@@ -169,13 +188,13 @@ namespace RefreshApp
         {
             Thread thread = new Thread(FileChange);
             //FileChange();
-            
+
             timer.Dispose();
-            
+
             thread.Start();
-            
+
             mes.Shutdown();
-            
+
         }
 
         public void FileChange()
@@ -189,8 +208,14 @@ namespace RefreshApp
                 FileInfo backInf = new FileInfo(backPath);
                 if (icoInf.Exists && backInf.Exists)
                 {
-                    icoInf.Delete();
-                    backInf.Delete();
+                    if (updateIc)
+                    {
+                        icoInf.Delete();
+                    }
+                    if (updateIm)
+                    {
+                        backInf.Delete();
+                    }
                     // альтернатива с помощью класса File
                     // File.Delete(path);
                 }
@@ -200,17 +225,30 @@ namespace RefreshApp
 
 
 ;
-
-                FileInfo icoFileInf = new FileInfo(updateIconPath);
-                FileInfo backFileInf = new FileInfo(updateImagePath);
-
-                if (icoFileInf.Exists && backFileInf.Exists)
+                if (updateIc)
                 {
-                    icoFileInf.MoveTo(iconPath);
-                    backFileInf.MoveTo(backPath);
-                    // альтернатива с помощью класса File
-                    // File.Move(path, newPath);
+                    FileInfo icoFileInf = new FileInfo(updateIconPath);
+                    if (icoFileInf.Exists)
+                    {
+                        icoFileInf.MoveTo(iconPath);
+                    }
                 }
+                if (updateIm)
+                {
+                    FileInfo backFileInf = new FileInfo(updateImagePath);
+                    if (backFileInf.Exists)
+                    {
+
+
+
+                        backFileInf.MoveTo(backPath);
+
+                        // альтернатива с помощью класса File
+                        // File.Move(path, newPath);
+                    }
+                }
+
+               
 
 
                 System.Diagnostics.Process.Start(Application.ResourceAssembly.Location);
