@@ -50,12 +50,12 @@ namespace RefreshApp
                     // альтернатива с помощью класса File
                     // File.Delete(path);
                 }
-                else
-                {
+                
+                
 
                     File.Copy(Directory.GetCurrentDirectory() + @"\Backrounds\Background.png", "D:/programRestart/mainImage.png");
                     File.Copy(Directory.GetCurrentDirectory() + @"\Icons\Icon.png", "D:/programRestart/mainIcon.png");
-                }
+                
             }
             catch(Exception a)
             {
@@ -81,12 +81,12 @@ namespace RefreshApp
                     // альтернатива с помощью класса File
                     // File.Delete(path);
                 }
-                else
-                {
+               
+               
 
                     File.Copy("D:/programRestart/mainIcon.png", "D:/programRestart/currentIcon.png");
                     File.Copy("D:/programRestart/mainImage.png", "D:/programRestart/currentImage.png");
-                }
+                
             }
             catch
             {
@@ -180,7 +180,8 @@ namespace RefreshApp
 
         public void FileChange()
         {
-            lock (lockObject) {
+            lock (lockObject)
+            {
                 string iconPath = Directory.GetCurrentDirectory() + @"\Icons\icon.png";
                 string backPath = Directory.GetCurrentDirectory() + @"\Backrounds\Background.png";
 
@@ -195,7 +196,7 @@ namespace RefreshApp
                 }
 
 
-           
+
 
 
 ;
@@ -203,7 +204,7 @@ namespace RefreshApp
                 FileInfo icoFileInf = new FileInfo(updateIconPath);
                 FileInfo backFileInf = new FileInfo(updateImagePath);
 
-                if (icoFileInf.Exists && backFileInf.Exists) 
+                if (icoFileInf.Exists && backFileInf.Exists)
                 {
                     icoFileInf.MoveTo(iconPath);
                     backFileInf.MoveTo(backPath);
@@ -212,8 +213,9 @@ namespace RefreshApp
                 }
 
 
-                //System.Diagnostics.Process.Start(Application.ResourceAssembly.Location);
-                System.Diagnostics.Process.Start("RefreshApp"); }
+                System.Diagnostics.Process.Start(Application.ResourceAssembly.Location);
+                // System.Diagnostics.Process.Start("RefreshApp"); 
+            }
         }
 
         private bool FileCompare(string file1, string file2)
